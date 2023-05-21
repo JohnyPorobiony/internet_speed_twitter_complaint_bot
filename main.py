@@ -1,18 +1,19 @@
+import os
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
-import os
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.support import expected_conditions as EC
 
-chrome_driver_path = "C:\Development\chromedriver.exe"  # Set your own chrome driver path
+chrome_driver_path = "C:\Development\chromedriver.exe"   # Your own browser driver path
 options = webdriver.ChromeOptions()
 options.add_argument("--start-maximized")
 service = Service(chrome_driver_path)
 driver = webdriver.Chrome(service=service, options=options)
-wait = WebDriverWait(driver, 30) # Selenium tool used to wait for the driver until expected_conditions has been achieved
+wait = WebDriverWait(driver, 20)
 
 LOGIN = os.getenv("twitter_login")
 PASSWORD = os.getenv("twitter_password")
@@ -52,14 +53,20 @@ class InternetSpeedTwitterBot:
         login_fill = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, 'r-30o5oe')))
         login_fill.send_keys(LOGIN)
         login_fill.send_keys(Keys.ENTER)
+        
+        # In some cases, if the user is logging too often it will be needed to enter username before the password as addidtional verification
+        try:    
+            password_fill = WebDriverWait(driver, 3).until(EC.element_to_be_clickable((By.XPATH, "/html/body/div/div/div/div[1]/div/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[1]/div/div/div[3]/div/label/div/div[2]/div[1]/input")))
+            password_fill.send_keys(PASSWORD)
+            password_fill.send_keys(Keys.ENTER)
+        except TimeoutException:
+            username_fill = wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/div/div/div/div[1]/div/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[1]/div/div[2]/label/div/div[2]/div/input")))
+            username_fill.send_keys(USERNAME)
+            username_fill.send_keys(Keys.ENTER)
 
-        verify = wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/div/div/div/div[1]/div/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[1]/div/div[2]/label/div/div[2]/div/input")))
-        verify.send_keys(USERNAME)
-        verify.send_keys(Keys.ENTER)
-
-        verify2 = wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/div/div/div/div[1]/div/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[1]/div/div/div[3]/div/label/div/div[2]/div[1]/input")))
-        verify2.send_keys(PASSWORD)
-        verify2.send_keys(Keys.ENTER)
+            password_fill = wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/div/div/div/div[1]/div/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[1]/div/div/div[3]/div/label/div/div[2]/div[1]/input")))
+            password_fill.send_keys(PASSWORD)
+            password_fill.send_keys(Keys.ENTER)
 
         time.sleep(3)
 
@@ -83,4 +90,3 @@ if (bot.declared_down > bot.real_down) or (bot.declared_up > bot.real_up):
     bot.send_tweet()
 
 input("To finish press 'Enter'")
-
