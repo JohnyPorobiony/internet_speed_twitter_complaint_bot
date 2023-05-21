@@ -9,8 +9,6 @@ It requires to pass into the environment variables:
 
 Individual parameters that have to be set in the __init__ method:
   * Internet provider's Twitter username
-  * Minimal declared internet speed down/up
+  * Minimum declared internet speed down/up
 
 As the Twitter website can change in the future it may be required to change logging in / tweet sending methods.
-
-The logging in method is designed for often logging in users, when Twitter requires additional verification. For users from whom Twitter does not require this type of verification logging in method needs to be changed.
